@@ -13,7 +13,7 @@ use crate::pointer;
 ///
 /// Internally holds a `Signal<Value>` so that any read in a reactive scope
 /// (component render, memo, effect) automatically tracks changes.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct DataModel {
     data: Signal<Value>,
 }

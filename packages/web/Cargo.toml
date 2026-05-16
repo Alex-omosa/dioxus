@@ -5,7 +5,9 @@ edition = "2021"
 
 [dependencies]
 dioxus = { workspace = true, features = ["router", "fullstack"] }
+serde_json = { workspace = true }
 ui = { workspace = true }
+a2ui = { workspace = true }
 
 [features]
 default = []

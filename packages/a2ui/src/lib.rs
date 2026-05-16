@@ -7,9 +7,6 @@
 //! - **Data Layer**: `protocol`, `pointer`, `data_model`, `component`, `surface`,
 //!   `context`, `catalog`, `functions`, `processor`
 //! - **Rendering Layer**: `hooks`, `surface_view`, `renderer`, `components`
-//!
-//! The data layer uses Dioxus signals directly for reactivity. The rendering
-//! layer provides Dioxus components that consume the data layer to paint the UI.
 
 // Data layer
 pub mod protocol;
@@ -22,6 +19,12 @@ pub mod catalog;
 pub mod functions;
 pub mod processor;
 
+// Rendering layer
+pub mod hooks;
+pub mod surface_view;
+pub mod renderer;
+pub mod components;
+
 // Re-exports for convenience
 pub use data_model::DataModel;
 pub use component::ComponentModel;
@@ -29,3 +32,4 @@ pub use surface::{SurfaceModel, SurfaceGroupModel};
 pub use processor::MessageProcessor;
 pub use catalog::Catalog;
 pub use protocol::{A2uiMessage, ClientAction, ClientMessage};
+pub use surface_view::A2uiSurface;

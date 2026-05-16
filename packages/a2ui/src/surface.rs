@@ -9,7 +9,7 @@ use crate::component::ComponentModel;
 use crate::data_model::DataModel;
 
 /// A single A2UI surface — one rendered UI tree.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct SurfaceModel {
     pub id: Signal<String>,
     pub catalog_id: Signal<String>,

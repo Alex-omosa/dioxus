@@ -6146,7 +6146,9 @@ dependencies = [
 name = "web"
 version = "0.1.0"
 dependencies = [
+ "a2ui",
  "dioxus",
+ "serde_json",
  "ui",
 ]
 
