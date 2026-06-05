@@ -16,12 +16,13 @@ pub fn A2uiSurface(surface: SurfaceModel) -> Element {
     use_context_provider(|| Signal::new(surface));
 
     let data_model = surface.data_model;
+    let root_id = surface.get_root_component_id();
 
     rsx! {
         div {
             class: "a2ui-surface",
             A2uiComponent {
-                component_id: "root".to_string(),
+                component_id: root_id,
                 data_model: data_model,
                 base_path: String::new(),
             }

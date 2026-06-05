@@ -4,9 +4,15 @@
 //! templates, where each iteration has a different base path.
 
 use serde_json::Value;
+use dioxus::prelude::*;
 
 use crate::data_model::DataModel;
+use crate::protocol::ClientAction;
 use crate::pointer;
+
+/// Context type for passing the action callback down to A2UI components
+#[derive(Clone)]
+pub struct A2uiActionContext(pub Callback<ClientAction>);
 
 /// Provides scoped access to the data model with a base path for relative
 /// pointer resolution.

@@ -61,6 +61,42 @@ impl SurfaceModel {
             }
         }
     }
+
+    /// Dynamically find the root component ID.
+    /// It looks for a component whose ID is not referenced as a child by any other component.
+    /// If an explicit "root" component exists, it returns "root".
+    /// Otherwise, it returns the first component without a parent, or "root" as fallback.
+    pub fn get_root_component_id(&self) -> String {
+        let comps = self.components.read();
+        
+        // Fast path: if "root" is explicitly defined
+        if comps.contains_key("root") {
+            return "root".to_string();
+        }
+        
+        let mut all_ids: std::collections::HashSet<String> = comps.keys().cloned().collect();
+        
+        // Remove any ID that is referenced as a child
+        for model in comps.values() {
+            // Check 'child' string prop
+            let child = model.get_str_prop("child");
+            if !child.is_empty() {
+                all_ids.remove(child);
+            }
+            
+            // Check 'children' array prop
+            if let Some(Value::Array(children)) = model.get_prop("children") {
+                for c in children {
+                    if let Some(c_str) = c.as_str() {
+                        all_ids.remove(c_str);
+                    }
+                }
+            }
+        }
+        
+        // Return the first unreferenced component, or fallback to "root"
+        all_ids.into_iter().next().unwrap_or_else(|| "root".to_string())
+    }
 }
 
 /// A collection of all active surfaces.
