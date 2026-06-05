@@ -10,51 +10,30 @@ use serde_json::Value;
 // Server → Client messages
 // ---------------------------------------------------------------------------
 
+/// A payload variant for a server-to-client A2UI message.
+///
+/// Exactly one variant is present per message. Serde's `untagged` + `flatten`
+/// combination ensures the JSON wire format remains a flat object with
+/// `"version"` plus the variant name as a key (e.g., `"createSurface"`).
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum A2uiPayload {
+    CreateSurface(CreateSurface),
+    UpdateComponents(UpdateComponents),
+    UpdateDataModel(UpdateDataModel),
+    DeleteSurface(DeleteSurface),
+}
+
 /// A single A2UI server-to-client message envelope.
 ///
 /// The JSON wire format uses a flat object with `"version"` plus exactly one
-/// of the four payload keys.
+/// of the four payload keys. The payload field uses `#[serde(flatten)]` to merge
+/// enum variants into the top-level message object.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct A2uiMessage {
     pub version: String,
-
-    #[serde(rename = "createSurface", skip_serializing_if = "Option::is_none")]
-    pub create_surface: Option<CreateSurface>,
-
-    #[serde(rename = "updateComponents", skip_serializing_if = "Option::is_none")]
-    pub update_components: Option<UpdateComponents>,
-
-    #[serde(rename = "updateDataModel", skip_serializing_if = "Option::is_none")]
-    pub update_data_model: Option<UpdateDataModel>,
-
-    #[serde(rename = "deleteSurface", skip_serializing_if = "Option::is_none")]
-    pub delete_surface: Option<DeleteSurface>,
-}
-
-impl A2uiMessage {
-    /// Returns which payload variant this message contains.
-    pub fn payload(&self) -> Option<MessagePayload<'_>> {
-        if let Some(ref p) = self.create_surface {
-            Some(MessagePayload::CreateSurface(p))
-        } else if let Some(ref p) = self.update_components {
-            Some(MessagePayload::UpdateComponents(p))
-        } else if let Some(ref p) = self.update_data_model {
-            Some(MessagePayload::UpdateDataModel(p))
-        } else if let Some(ref p) = self.delete_surface {
-            Some(MessagePayload::DeleteSurface(p))
-        } else {
-            None
-        }
-    }
-}
-
-/// Convenience enum for pattern-matching the message payload.
-#[derive(Debug)]
-pub enum MessagePayload<'a> {
-    CreateSurface(&'a CreateSurface),
-    UpdateComponents(&'a UpdateComponents),
-    UpdateDataModel(&'a UpdateDataModel),
-    DeleteSurface(&'a DeleteSurface),
+    #[serde(flatten)]
+    pub payload: A2uiPayload,
 }
 
 // ---------------------------------------------------------------------------
@@ -186,10 +165,14 @@ mod tests {
         }"#;
         let msg: A2uiMessage = serde_json::from_str(json).unwrap();
         assert_eq!(msg.version, "v0.9");
-        let cs = msg.create_surface.unwrap();
-        assert_eq!(cs.surface_id, "test_1");
-        assert_eq!(cs.catalog_id, "https://example.com/catalog.json");
-        assert_eq!(cs.send_data_model, Some(true));
+        match &msg.payload {
+            A2uiPayload::CreateSurface(cs) => {
+                assert_eq!(cs.surface_id, "test_1");
+                assert_eq!(cs.catalog_id, "https://example.com/catalog.json");
+                assert_eq!(cs.send_data_model, Some(true));
+            }
+            _ => panic!("Expected CreateSurface variant"),
+        }
     }
 
     #[test]
@@ -205,9 +188,13 @@ mod tests {
             }
         }"#;
         let msg: A2uiMessage = serde_json::from_str(json).unwrap();
-        let uc = msg.update_components.unwrap();
-        assert_eq!(uc.surface_id, "test_1");
-        assert_eq!(uc.components.len(), 2);
+        match &msg.payload {
+            A2uiPayload::UpdateComponents(uc) => {
+                assert_eq!(uc.surface_id, "test_1");
+                assert_eq!(uc.components.len(), 2);
+            }
+            _ => panic!("Expected UpdateComponents variant"),
+        }
     }
 
     #[test]
@@ -221,9 +208,13 @@ mod tests {
             }
         }"#;
         let msg: A2uiMessage = serde_json::from_str(json).unwrap();
-        let udm = msg.update_data_model.unwrap();
-        assert_eq!(udm.surface_id, "test_1");
-        assert_eq!(udm.path.as_deref(), Some("/username"));
+        match &msg.payload {
+            A2uiPayload::UpdateDataModel(udm) => {
+                assert_eq!(udm.surface_id, "test_1");
+                assert_eq!(udm.path.as_deref(), Some("/username"));
+            }
+            _ => panic!("Expected UpdateDataModel variant"),
+        }
     }
 
     #[test]
@@ -235,8 +226,12 @@ mod tests {
             }
         }"#;
         let msg: A2uiMessage = serde_json::from_str(json).unwrap();
-        let ds = msg.delete_surface.unwrap();
-        assert_eq!(ds.surface_id, "test_1");
+        match &msg.payload {
+            A2uiPayload::DeleteSurface(ds) => {
+                assert_eq!(ds.surface_id, "test_1");
+            }
+            _ => panic!("Expected DeleteSurface variant"),
+        }
     }
 
     #[test]
