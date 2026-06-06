@@ -14,7 +14,7 @@ use crate::surface::SurfaceModel;
 /// Given a component ID, it looks up the component model from the surface,
 /// determines its type, and renders the appropriate Dioxus component.
 #[component]
-pub fn A2uiComponent(
+pub fn A2uiComponentRender(
     component_id: String,
     data_model: DataModel,
     base_path: String,

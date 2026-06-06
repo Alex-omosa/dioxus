@@ -5,7 +5,7 @@ use serde_json::Value;
 
 use crate::component::ComponentModel;
 use crate::data_model::DataModel;
-use crate::renderer::A2uiComponent;
+use crate::renderer::A2uiComponentRender;
 
 #[component]
 pub fn A2uiColumn(model: ComponentModel, data_model: DataModel, base_path: String) -> Element {
@@ -46,10 +46,10 @@ pub fn A2uiColumn(model: ComponentModel, data_model: DataModel, base_path: Strin
                     gap: "8px",
 
                     for child_id in ids {
-                        A2uiComponent {
+                        A2uiComponentRender {
                             key: "{child_id}",
                             component_id: child_id.clone(),
-                            data_model: data_model,
+                            data_model,
                             base_path: base_path.clone(),
                         }
                     }
@@ -88,16 +88,18 @@ pub fn A2uiColumn(model: ComponentModel, data_model: DataModel, base_path: Strin
                     gap: "8px",
 
                     for i in 0..item_count {
-                        A2uiComponent {
+                        A2uiComponentRender {
                             key: "{template_id}-{i}",
                             component_id: template_id.clone(),
-                            data_model: data_model,
+                            data_model,
                             base_path: format!("{}/{i}", crate::pointer::make_absolute(&data_path, &base_path)),
                         }
                     }
                 }
             }
         }
-        _ => rsx! { div { class: "a2ui-column" } },
+        _ => rsx! {
+            div { class: "a2ui-column" }
+        },
     }
 }

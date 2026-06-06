@@ -2,7 +2,7 @@
 
 use dioxus::prelude::*;
 
-use crate::renderer::A2uiComponent;
+use crate::renderer::A2uiComponentRender;
 use crate::surface::SurfaceModel;
 
 /// Renders a single A2UI surface.
@@ -20,7 +20,7 @@ pub fn A2uiSurface(surface: SurfaceModel) -> Element {
 
     rsx! {
         div { class: "a2ui-surface",
-            A2uiComponent {
+            A2uiComponentRender {
                 component_id: root_id,
                 data_model,
                 base_path: String::new(),

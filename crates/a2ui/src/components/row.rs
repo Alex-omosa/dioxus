@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 
 use crate::component::ComponentModel;
 use crate::data_model::DataModel;
-use crate::renderer::A2uiComponent;
+use crate::renderer::A2uiComponentRender;
 
 #[component]
 pub fn A2uiRow(model: ComponentModel, data_model: DataModel, base_path: String) -> Element {
@@ -37,10 +37,10 @@ pub fn A2uiRow(model: ComponentModel, data_model: DataModel, base_path: String) 
             gap: "8px",
 
             for child_id in children_ids {
-                A2uiComponent {
+                A2uiComponentRender {
                     key: "{child_id}",
                     component_id: child_id.clone(),
-                    data_model: data_model,
+                    data_model,
                     base_path: base_path.clone(),
                 }
             }
