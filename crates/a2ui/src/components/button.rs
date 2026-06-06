@@ -13,8 +13,8 @@ pub fn A2uiButton(model: ComponentModel, data_model: DataModel, base_path: Strin
     let variant = model.get_str_prop("variant").to_string();
     let child_id = model.get_str_prop("child").to_string();
     let action = model.get_prop("action").cloned();
-    let surface_ctx = use_context::<Signal<SurfaceModel>>();
-    let surface_id_clone = surface_ctx.read().id.read().clone();
+    let surface_ctx = use_context::<SurfaceModel>();
+    let surface_id_clone = surface_ctx.id.read().clone();
     let component_id = model.id.clone();
 
     // Check if there is an action handler provided
@@ -25,7 +25,7 @@ pub fn A2uiButton(model: ComponentModel, data_model: DataModel, base_path: Strin
         "borderless" => "a2ui-button a2ui-button-borderless",
         _ => "a2ui-button",
     };
-
+    
     rsx! {
         button {
             class: "{btn_class}",

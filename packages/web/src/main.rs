@@ -1,8 +1,6 @@
-use a2ui::{A2uiMessage, MessageProcessor};
-use dioxus::{html::KeyCode::A, prelude::*};
+use dioxus::prelude::*;
 use futures::StreamExt;
-use nats::{provider::NatsContext, try_use_nats, try_use_nats_signal, NatsProvider};
-use serde_json::Deserializer;
+use nats::{try_use_nats_signal, NatsProvider};
 
 fn main() {
     dioxus::launch(App);
@@ -15,7 +13,7 @@ fn App() -> Element {
             url: "ws://localhost:8081".to_string(),
             user: Some("auth".to_string()),
             pass: Some("auth".to_string()),
-            A2uiProvider { Home {} }
+            A2uiProvider {}
         }
     }
 }
@@ -100,70 +98,50 @@ fn Home() -> Element {
     }
 }
 
-#[component]
-pub fn A2uiProvider(children: Element) -> Element {
-    // 1. Provide the MessageProcessor to the Dioxus tree.
-    // Because MessageProcessor is `Copy` and contains `Signal`s,
-    // Dioxus can track mutations to those inner signals perfectly!
-    let mut processor = use_context_provider(|| MessageProcessor::new());
 
-    // 2. Get the NATS client from the parent NatsProvider
+#[component]
+pub fn A2uiProvider() -> Element {
+    let mut processor = use_context_provider(|| a2ui::MessageProcessor::new());
     let nats_signal = try_use_nats_signal();
     let mut has_subscribed = use_signal(|| false);
 
-    // 3. React to the NATS connection state
     use_effect(move || {
         if let Some(signal) = nats_signal {
-            // Read the signal to subscribe to connection changes
             if let Some(client) = signal.read().clone() {
                 if !*has_subscribed.read() {
                     has_subscribed.set(true);
 
-                    // 4. Spawn the async listener in the background
                     spawn(async move {
                         match client.subscribe("a2ui.ui").await {
                             Ok(mut subscriber) => {
                                 tracing::info!("✅ A2UI Provider subscribed to 'a2ui.ui'");
 
-                                // 5. The Message Entry Point
                                 let mut seq: u64 = 0;
                                 while let Some(msg) = subscriber.next().await {
-                                    // Trim leading/trailing whitespace/newlines from the payload
-                                    // so the streaming deserializer doesn't attempt to parse an
-                                    // extra empty value and produce spurious errors.
                                     let payload_str = String::from_utf8_lossy(&msg.payload);
                                     let trimmed = payload_str.trim();
                                     seq += 1;
                                     tracing::info!("📨 NATS message #{} ({} bytes)", seq, msg.payload.len());
 
-                                    // Parse NDJSON safely: split on lines and skip blanks.
                                     for line in trimmed.lines() {
                                         let line = line.trim();
                                         if line.is_empty() {
                                             continue;
                                         }
-
                                         match serde_json::from_str::<a2ui::A2uiMessage>(line) {
                                             Ok(a2ui_msg) => {
-                                                tracing::info!(
-                                                    "✅ Processing A2UI message: {:?}",
-                                                    a2ui_msg.payload
-                                                );
+                                                tracing::info!("✅ Processing: {:?}", a2ui_msg.payload);
                                                 processor.process(&a2ui_msg);
                                             }
                                             Err(e) => {
-                                                tracing::error!(
-                                                    "❌ Failed to parse A2UI message: {:?}",
-                                                    e
-                                                );
+                                                tracing::error!("❌ Failed to parse: {:?}", e);
                                             }
                                         }
                                     }
                                 }
                             }
                             Err(e) => {
-                                tracing::error!("❌ Failed to subscribe to NATS: {:?}", e);
-                                // Optional: reset has_subscribed to allow retry logic later
+                                tracing::error!("❌ Failed to subscribe: {:?}", e);
                                 has_subscribed.set(false);
                             }
                         }
@@ -173,8 +151,12 @@ pub fn A2uiProvider(children: Element) -> Element {
         }
     });
 
-    rsx! {
-        {children}
+    // Read all active surfaces from the processor and render each one
+    let surfaces = processor.surfaces.surfaces.read();
 
+    rsx! {
+        for (_id , surface) in surfaces.iter() {
+            a2ui::A2uiSurface { surface: *surface }
+        }
     }
 }
