@@ -13,17 +13,16 @@ use crate::surface::SurfaceModel;
 #[component]
 pub fn A2uiSurface(surface: SurfaceModel) -> Element {
     // Provide the surface as context for child components (Button needs it for actions)
-    use_context_provider(|| Signal::new(surface));
+    use_context_provider(|| surface);
 
     let data_model = surface.data_model;
     let root_id = surface.get_root_component_id();
 
     rsx! {
-        div {
-            class: "a2ui-surface",
+        div { class: "a2ui-surface",
             A2uiComponent {
                 component_id: root_id,
-                data_model: data_model,
+                data_model,
                 base_path: String::new(),
             }
         }

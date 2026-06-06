@@ -19,11 +19,8 @@ pub fn A2uiComponent(
     data_model: DataModel,
     base_path: String,
 ) -> Element {
-    let surface = use_context::<Signal<SurfaceModel>>();
-    let model = {
-        let s = surface.read();
-        s.get_component(&component_id)
-    };
+    let surface = use_context::<SurfaceModel>();
+    let  model = surface.get_component(&component_id); 
 
     match model {
         None => {
@@ -33,22 +30,22 @@ pub fn A2uiComponent(
         Some(model) => {
             match model.component_type.as_str() {
                 "Text" => rsx! {
-                    A2uiText { model: model, data_model: data_model, base_path: base_path }
+                    A2uiText { model, data_model, base_path }
                 },
                 "Row" => rsx! {
-                    A2uiRow { model: model, data_model: data_model, base_path: base_path }
+                    A2uiRow { model, data_model, base_path }
                 },
                 "Column" => rsx! {
-                    A2uiColumn { model: model, data_model: data_model, base_path: base_path }
+                    A2uiColumn { model, data_model, base_path }
                 },
                 "Button" => rsx! {
-                    A2uiButton { model: model, data_model: data_model, base_path: base_path }
+                    A2uiButton { model, data_model, base_path }
                 },
                 "TextField" => rsx! {
-                    A2uiTextField { model: model, data_model: data_model, base_path: base_path }
+                    A2uiTextField { model, data_model, base_path }
                 },
                 _ => rsx! {
-                    A2uiFallback { model: model }
+                    A2uiFallback { model }
                 },
             }
         }
