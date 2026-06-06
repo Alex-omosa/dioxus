@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "packages/a2ui",
+    "crates/a2ui",
     "packages/ui",
     "packages/web",
     "packages/desktop",
@@ -15,6 +15,6 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 # workspace
-a2ui = { path = "packages/a2ui" }
+a2ui = { path = "crates/a2ui" }
 ui = { path = "packages/ui" }
 api = { path = "packages/api" }
