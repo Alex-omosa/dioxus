@@ -8,6 +8,9 @@ dioxus = { workspace = true, features = ["router", "fullstack"] }
 serde_json = { workspace = true }
 ui = { workspace = true }
 a2ui = { workspace = true }
+nats = {path = "/home/alexomosa/company/apps/packages/nats"}
+tracing = "0.1.44"
+futures = "0.3.32"
 
 [features]
 default = []
