@@ -5,3 +5,4 @@
 {"version":"v0.9","updateDataModel":{"surfaceId":"profile-surface","path":"/","value":{"user":{"name":"Alice Kamau","email":"alice@example.com","bio":"Software engineer based in Nairobi."}}}}
 {"version":"v0.9","updateDataModel":{"surfaceId":"profile-surface","path":"/user/name","value":"Alice Wanjiku Kamau"}}
 {"version":"v0.9","deleteSurface":{"surfaceId":"profile-surface"}}
+

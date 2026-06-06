@@ -100,6 +100,10 @@ impl SurfaceModel {
 }
 
 /// A collection of all active surfaces.
+/// SurfaceGroupModel is simply the renderer-side container that holds
+/// all currently active surfaces. At any given moment, multiple agents 
+/// could be running simultaneously, each owning one or more surfaces. 
+/// The group model tracks all of them in one place.
 #[derive(Clone, Copy)]
 pub struct SurfaceGroupModel {
     pub surfaces: Signal<HashMap<String, SurfaceModel>>,

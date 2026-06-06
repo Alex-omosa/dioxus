@@ -1085,7 +1085,12 @@ dependencies = [
 name = "desktop"
 version = "0.1.0"
 dependencies = [
+ "a2ui",
  "dioxus",
+ "futures",
+ "nats",
+ "serde_json",
+ "tracing",
  "ui",
 ]
 
@@ -3588,7 +3593,12 @@ dependencies = [
 name = "mobile"
 version = "0.1.0"
 dependencies = [
+ "a2ui",
  "dioxus",
+ "futures",
+ "nats",
+ "serde_json",
+ "tracing",
  "ui",
 ]
 

@@ -6,6 +6,11 @@ edition = "2021"
 [dependencies]
 dioxus = { workspace = true, features = ["router", "fullstack"] }
 ui = { workspace = true }
+serde_json = { workspace = true }
+a2ui = { workspace = true }
+nats = {path = "/home/alexomosa/company/apps/packages/nats"}
+tracing = "0.1.44"
+futures = "0.3.32"
 
 [features]
 default = []

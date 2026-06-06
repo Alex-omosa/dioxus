@@ -14,7 +14,7 @@ set -euo pipefail
 
 # ── defaults ──────────────────────────────────────────────────────────────────
 SERVER="${NATS_URL:-nats://localhost:4222}"
-DELAY=0          # seconds between messages
+DELAY=0.3        # seconds between messages
 SUBJECT="a2ui.ui"
 MESSAGES_FILE="$(dirname "$0")/a2ui_messages.json"
 
@@ -53,14 +53,16 @@ while IFS= read -r line; do
 
   seq=$((seq + 1))
 
-  # Pretty-print the message type for logging
-  msg_type=$(echo "$line" | grep -oP '"(createSurface|updateComponents|updateDataModel|deleteSurface)"' | head -1 | tr -d '"' || echo "unknown")
+  # || true prevents grep's non-zero exit (no match) from killing the script
+  msg_type=$(echo "$line" | grep -oP '"(createSurface|updateComponents|updateDataModel|deleteSurface)"' | head -1 | tr -d '"' || true)
+  [[ -z "$msg_type" ]] && msg_type="unknown"
 
   echo "📨  [${seq}] ${msg_type}"
 
   nats pub "$SUBJECT" --server "$SERVER" "$line"
 
-  sleep "$DELAY"
+  [[ "${DELAY}" != "0" ]] && sleep "$DELAY"
+
 done < "$MESSAGES_FILE"
 
 echo "────────────────────────────────────────────────"
